@@ -19,6 +19,7 @@ const fetchPageData = async () => {
 
   articleParagraphs.each((i, element) => {
     const translationPromise = new Promise((resolve, reject) => {
+      //@ts-ignore
       getTranslationText('bn', 'en', element.children[0].data)
         .then((translatedParagraph) => {
           resolve(translatedParagraph);

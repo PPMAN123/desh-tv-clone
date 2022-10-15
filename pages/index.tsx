@@ -2,7 +2,7 @@ import Head from 'next/head';
 import fetchPageData from '../src/data';
 import fetchHomePage from '../src/data/homeScrape';
 import React from 'react';
-import Navbar from '../src/components/navbar';
+import Navbar from '../src/components/Navbar';
 import styled from 'styled-components';
 import IndexMainArticles from '../src/components/IndexMainArticles';
 
