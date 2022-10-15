@@ -5,7 +5,7 @@ import request from '../utils/request';
 import getTranslatedText from '../utils/getTranslatedText';
 
 const fetchHomePage = async () => {
-  const { data } = await request.get('http://localhost:3000/data/desh-tv/');
+  const { data } = await request.get('/data/desh-tv/');
 
   const dom = cheerio.load(data);
   const anchors = dom('.newsblock > a').slice(0, 5);

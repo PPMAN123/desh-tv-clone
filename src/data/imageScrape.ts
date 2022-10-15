@@ -14,9 +14,7 @@ const fetchImageLink = async ({ articleUrl }: fetchImageLinkTypes) => {
     encodedUrl = encodeURI(articleUrl.substring(16));
   }
 
-  const { data } = await request.get(
-    `http://localhost:3000/data/desh-tv/${encodedUrl}/`
-  );
+  const { data } = await request.get(`/data/desh-tv/${encodedUrl}/`);
 
   const dom = cheerio.load(data);
   const imageLink = dom('figure > img')[0].attribs['data-air-img'];
