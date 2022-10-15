@@ -1,0 +1,11 @@
+{
+  "[typescript]": {
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+  },
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnType": false,
+  "typescript.format.insertSpaceAfterTypeAssertion": true,
+  "editor.formatOnSaveMode": "modificationsIfAvailable",
+}
