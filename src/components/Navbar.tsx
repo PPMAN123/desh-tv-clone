@@ -7,6 +7,7 @@ const NavWrapper = styled.div`
   align-items: center;
   height: 60px;
   background-color: #dcdcdc;
+  width: 100%;
 `;
 
 const NavContentWrapper = styled.div`

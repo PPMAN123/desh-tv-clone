@@ -3,7 +3,19 @@ import styled from 'styled-components';
 import IndexMainArticle from './IndexMainArticle';
 
 const IndexMainArticlesWrapper = styled.div`
-  margin: 50px 380px;
+  margin: 50px 22.5vw;
+  width: 55vw;
+  @media (max-width: 1200px) {
+    margin: 50px 7.5vw;
+    width: 85vw;
+  }
+  display: flex;
+  flex-direction: column;
+  @media (max-width: 576px) {
+    align-items: center;
+    margin: 25px 3vw;
+    width: 94vw;
+  } ;
 `;
 
 const TopStories = styled.h2`
@@ -15,11 +27,14 @@ const IndexMainArticles = ({ titles, urls, imageLinks }) => {
   return (
     <IndexMainArticlesWrapper>
       <TopStories>Top Stories</TopStories>
-      <IndexMainArticle
-        title={titles[0]}
-        url={urls[0]}
-        imageLink={imageLinks[0]}
-      />
+      {titles.map((title, index) => (
+        <IndexMainArticle
+          title={title}
+          url={urls[index]}
+          imageLink={imageLinks[index]}
+          orientation={index % 2 == 0 ? 'left' : 'right'}
+        />
+      ))}
     </IndexMainArticlesWrapper>
   );
 };

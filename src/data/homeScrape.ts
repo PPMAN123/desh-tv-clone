@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 import fetchImageLink from './imageScrape';
-import { getTranslationText } from 'lingva-scraper';
+import { faker } from '@faker-js/faker';
 import request from '../utils/request';
 import getTranslatedText from '../utils/getTranslatedText';
 
@@ -62,4 +62,21 @@ const fetchHomePage = async () => {
   };
 };
 
-export default fetchHomePage;
+const fetchMockedHomePage = async () => {
+  let urls = [];
+  let imageLinks = [];
+  let translatedTitles = [];
+  for (let i = 0; i < 5; i++) {
+    urls.push(faker.internet.url());
+    imageLinks.push(faker.image.imageUrl(750, 422));
+    translatedTitles.push(faker.lorem.sentence(7));
+  }
+
+  return {
+    urls,
+    translatedTitles,
+    imageLinks,
+  };
+};
+
+export default fetchMockedHomePage;
