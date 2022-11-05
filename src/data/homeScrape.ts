@@ -10,7 +10,7 @@ const fetchHomePage = async () => {
   const dom = cheerio.load(data);
   const anchors = dom('.newsblock > a').slice(0, 5);
 
-  const urls = [];
+  const urls: Array<string> = [];
   const titles = [];
 
   anchors.each((i, anchor) => {
@@ -54,8 +54,23 @@ const fetchHomePage = async () => {
   //make this thing a function
 
   const translatedTitles = await Promise.all(titlePromiseArray);
+  console.log(urls);
+
+  let categories = [];
+  urls.forEach((url) => {
+    if (url.includes('https://desh.tv/')) {
+      categories.push(
+        url.substring(url.indexOf('tv') + 3, url.indexOf('details') - 1)
+      );
+    } else {
+      categories.push(url.substring(1, url.indexOf('details') - 1));
+    }
+  });
+
+  console.log(categories);
 
   return {
+    categories,
     urls,
     translatedTitles,
     imageLinks,
@@ -66,17 +81,20 @@ const fetchMockedHomePage = async () => {
   let urls = [];
   let imageLinks = [];
   let translatedTitles = [];
+  let categories = [];
   for (let i = 0; i < 5; i++) {
     urls.push(faker.internet.url());
     imageLinks.push(faker.image.imageUrl(750, 422));
     translatedTitles.push(faker.lorem.sentence(7));
+    categories.push(faker.word.noun());
   }
 
   return {
+    categories,
     urls,
     translatedTitles,
     imageLinks,
   };
 };
 
-export default fetchMockedHomePage;
+export default fetchHomePage;

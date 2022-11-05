@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import getImage from '../utils/getImage';
+import Link from 'next/link';
+import getArticleSlug from '../utils/getArticleSlug';
 
 const ArticleTitleWrapper = styled.h3`
   font-family: Teko;
@@ -87,7 +89,7 @@ const StyledImage = styled.img`
   width: 100%;
 `;
 
-const IndexMainArticle = ({ title, url, imageLink, orientation }) => {
+const IndexMainArticle = ({ title, url, imageLink, orientation, category }) => {
   const [image, setImage] = React.useState();
   React.useEffect(() => {
     if (imageLink) {
@@ -96,21 +98,32 @@ const IndexMainArticle = ({ title, url, imageLink, orientation }) => {
       });
     }
   }, [imageLink]);
+
+  let slug = '';
+
+  if (url && category) {
+    slug = getArticleSlug({ url, category });
+  }
+
+  console.log(slug);
+
   return (
-    <ArticleWrapper orientation={orientation}>
-      {image && (
-        <ImageFilter>
-          <ArticleImage>
-            <StyledImage src={image} />
-          </ArticleImage>
-          <FilterDiv />
-        </ImageFilter>
-      )}
-      <ArticleTitleWrapper orientation={orientation}>
-        <ArticleCategory></ArticleCategory>
-        <ArticleTitle>{title}</ArticleTitle>
-      </ArticleTitleWrapper>
-    </ArticleWrapper>
+    <Link href={`/article/${slug}`}>
+      <ArticleWrapper orientation={orientation}>
+        {image && (
+          <ImageFilter>
+            <ArticleImage>
+              <StyledImage src={image} />
+            </ArticleImage>
+            <FilterDiv />
+          </ImageFilter>
+        )}
+        <ArticleTitleWrapper orientation={orientation}>
+          <ArticleCategory>{category}</ArticleCategory>
+          <ArticleTitle>{title}</ArticleTitle>
+        </ArticleTitleWrapper>
+      </ArticleWrapper>
+    </Link>
   );
 };
 

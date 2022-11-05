@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "pages/api/translate.js", "next.config.js"  ],
+, "pages/api/translate.js", "next.config.js", "pages/article/...[slug].tsx"  ],
   "exclude": [
     "node_modules"
   ]

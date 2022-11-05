@@ -23,7 +23,7 @@ const TopStories = styled.h2`
   font-family: Teko;
 `;
 
-const IndexMainArticles = ({ titles, urls, imageLinks }) => {
+const IndexMainArticles = ({ titles, urls, imageLinks, categories }) => {
   return (
     <IndexMainArticlesWrapper>
       <TopStories>Top Stories</TopStories>
@@ -33,6 +33,7 @@ const IndexMainArticles = ({ titles, urls, imageLinks }) => {
           url={urls[index]}
           imageLink={imageLinks[index]}
           orientation={index % 2 == 0 ? 'left' : 'right'}
+          category={categories[index]}
         />
       ))}
     </IndexMainArticlesWrapper>
