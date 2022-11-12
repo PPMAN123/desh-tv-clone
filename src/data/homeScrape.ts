@@ -54,7 +54,6 @@ const fetchHomePage = async () => {
   //make this thing a function
 
   const translatedTitles = await Promise.all(titlePromiseArray);
-  console.log(urls);
 
   let categories = [];
   urls.forEach((url) => {
@@ -66,8 +65,6 @@ const fetchHomePage = async () => {
       categories.push(url.substring(1, url.indexOf('details') - 1));
     }
   });
-
-  console.log(categories);
 
   return {
     categories,

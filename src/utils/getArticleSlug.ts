@@ -1,10 +1,11 @@
-type getArticleSlugTypes = {
-  url: string;
-  category: string;
-};
-
-const getArticleSlug = ({ url, category }: getArticleSlugTypes) => {
-  return `/${url.substring(url.indexOf('tv' + 3))}`;
+const getArticleSlug = (url) => {
+  let newUrl = '';
+  if (url.includes('desh.tv')) {
+    newUrl = url.substring(url.indexOf('tv') + 2);
+  } else {
+    newUrl = url;
+  }
+  return newUrl;
 };
 
 export default getArticleSlug;

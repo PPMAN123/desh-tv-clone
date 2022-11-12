@@ -102,13 +102,11 @@ const IndexMainArticle = ({ title, url, imageLink, orientation, category }) => {
   let slug = '';
 
   if (url && category) {
-    slug = getArticleSlug({ url, category });
+    slug = getArticleSlug(url);
   }
 
-  console.log(slug);
-
   return (
-    <Link href={`/article/${slug}`}>
+    <Link href={`/article${slug}`}>
       <ArticleWrapper orientation={orientation}>
         {image && (
           <ImageFilter>
