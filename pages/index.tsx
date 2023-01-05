@@ -19,6 +19,7 @@ export default function Home({ data }) {
     <PageWrapper>
       {isMobile ? <MobileNav /> : <Navbar />}
       <IndexMainArticles
+        pageTitle="Top Stories"
         titles={titles}
         urls={urls}
         imageLinks={imageLinks}

@@ -3,12 +3,13 @@ import fetchImageLink from './imageScrape';
 import { faker } from '@faker-js/faker';
 import request from '../utils/request';
 import getTranslatedText from '../utils/getTranslatedText';
+import getImage from '../utils/getImage';
 
-const fetchHomePage = async () => {
-  const { data } = await request.get('/data/desh-tv/');
+const fetchCategoryPage = async (category) => {
+  const { data } = await request.get(`/data/desh-tv/${category}`);
 
   const dom = cheerio.load(data);
-  const anchors = dom('.newsblock > a').slice(0, 5);
+  const anchors = dom('.newsblock > a').slice(0, 24);
 
   const urls: Array<string> = [];
   const titles = [];
@@ -18,9 +19,6 @@ const fetchHomePage = async () => {
     titles.push(anchor.attribs.title);
   });
 
-  // urls.forEach(async (url, i) => {
-  //   const imageUrl = await fetchImageLink({ articleUrl: url });
-  // });
   const imagePromiseArray = [];
   urls.forEach((url) => {
     const imageLinkPromise = new Promise((resolve, reject) => {
@@ -51,47 +49,54 @@ const fetchHomePage = async () => {
     });
     titlePromiseArray.push(titleTranslatePromise);
   });
-  //make this thing a function
 
   const translatedTitles = await Promise.all(titlePromiseArray);
 
-  let categories = [];
-  urls.forEach((url) => {
-    if (url.includes('https://desh.tv/')) {
-      categories.push(
-        url.substring(url.indexOf('tv') + 3, url.indexOf('details') - 1)
-      );
-    } else {
-      categories.push(url.substring(1, url.indexOf('details') - 1));
-    }
+  const imageDataPromises = [];
+
+  imageLinks.forEach((imageLink) => {
+    const titleTranslatePromise = new Promise((resolve, reject) => {
+      getImage(imageLink)
+        .then((imageData) => {
+          resolve(imageData);
+        })
+        .catch(() => {
+          reject();
+        });
+    });
+    imageDataPromises.push(titleTranslatePromise);
   });
 
+  const imageData = await Promise.all(imageDataPromises);
+
   return {
-    categories,
+    category,
     urls,
     translatedTitles,
     imageLinks,
+    imageData,
   };
 };
 
-const fetchMockedHomePage = async () => {
+const fetchMockedCategoryPage = async (category) => {
   let urls = [];
   let imageLinks = [];
   let translatedTitles = [];
-  let categories = [];
-  for (let i = 0; i < 5; i++) {
+  let imageData = [];
+  for (let i = 0; i < 24; i++) {
     urls.push(faker.internet.url());
     imageLinks.push(faker.image.imageUrl(750, 422));
     translatedTitles.push(faker.lorem.sentence(7));
-    categories.push(faker.word.noun());
+    imageData.push(faker.image.imageUrl(750, 422));
   }
 
   return {
-    categories,
+    category,
     urls,
     translatedTitles,
     imageLinks,
+    imageData,
   };
 };
 
-export default fetchMockedHomePage;
+export default fetchMockedCategoryPage;

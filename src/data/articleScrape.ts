@@ -17,9 +17,16 @@ const fetchArticle = async (articleUrl) => {
   const recommendedArticleThumbnails = dom(
     '.col-md-12 > .row > div > div > ._air-load-image'
   );
+  const recommendedArticleLinksAnchors = dom(
+    '.col-md-12 > .row > div > div > a'
+  );
 
   const translatedTitle = await getTranslatedText('bn', 'en', title);
   const translatedDate = await getTranslatedText('bn', 'en', date);
+  const recommendedArticleLinks = [];
+  recommendedArticleLinksAnchors.each((i, element) => {
+    recommendedArticleLinks.push(element.attribs.href);
+  });
 
   const translatedParagraphPromises = [];
 
@@ -66,6 +73,8 @@ const fetchArticle = async (articleUrl) => {
     recommendedArticleThumbnailLinks.push(thumbnailUrl);
   });
 
+  console.log(recommendedArticleThumbnailLinks);
+
   const articleImageLink = await fetchImageLink({ articleUrl });
   const articleImageData = await getImage(articleImageLink);
 
@@ -95,6 +104,7 @@ const fetchArticle = async (articleUrl) => {
     articleImageData,
     translatedRecommendedArticleTitles,
     recommendedArticleThumbailData,
+    recommendedArticleLinks,
   };
 };
 

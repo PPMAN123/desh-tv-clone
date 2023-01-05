@@ -14,4 +14,4 @@ const mockGetImage = async (imageLink) => {
   return imageLink;
 };
 
-export default getImage;
+export default mockGetImage;

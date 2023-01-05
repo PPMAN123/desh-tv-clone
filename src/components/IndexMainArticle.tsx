@@ -4,7 +4,7 @@ import getImage from '../utils/getImage';
 import Link from 'next/link';
 import getArticleSlug from '../utils/getArticleSlug';
 
-const ArticleTitleWrapper = styled.h3`
+const ArticleTitleWrapper = styled.h3<{ orientation: string }>`
   font-family: Teko;
   text-align: ${(prop) => (prop.orientation == 'left' ? 'left' : 'right')};
   margin: 0 30px;
@@ -30,7 +30,7 @@ const ArticleTitleWrapper = styled.h3`
   } ;
 `;
 
-const ArticleWrapper = styled.div`
+const ArticleWrapper = styled.div<{ orientation: string }>`
   display: flex;
   ${(prop) =>
     `flex-direction: ${prop.orientation == 'left' ? 'row;' : 'row-reverse;'}`}
@@ -117,7 +117,9 @@ const IndexMainArticle = ({ title, url, imageLink, orientation, category }) => {
           </ImageFilter>
         )}
         <ArticleTitleWrapper orientation={orientation}>
-          <ArticleCategory>{category}</ArticleCategory>
+          {category && (
+            <ArticleCategory>{category.replace('-', ' ')}</ArticleCategory>
+          )}
           <ArticleTitle>{title}</ArticleTitle>
         </ArticleTitleWrapper>
       </ArticleWrapper>

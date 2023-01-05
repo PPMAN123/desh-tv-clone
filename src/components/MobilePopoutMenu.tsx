@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { ImCross } from 'react-icons/im';
 import { faker } from '@faker-js/faker';
 
-const PopoutWrapper = styled.nav`
+const PopoutWrapper = styled.nav<{ openPopout: boolean }>`
   position: fixed;
   transform: ${(p) => (p.openPopout ? 'translateX(0)' : 'translateX(-1000px)')};
   display: flex;
