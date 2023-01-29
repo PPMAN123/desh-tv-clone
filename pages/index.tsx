@@ -14,6 +14,7 @@ export default function Home({ data }) {
   const [urls, setUrls] = React.useState(data.urls);
   const [categories, setCategories] = React.useState(data.categories);
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const [numOfArticles, setNumOfArticles] = React.useState(0);
 
   return (
     <PageWrapper>
@@ -24,6 +25,8 @@ export default function Home({ data }) {
         urls={urls}
         imageLinks={imageLinks}
         categories={categories}
+        numOfArticles={numOfArticles}
+        setNumOfArticles={setNumOfArticles}
       />
     </PageWrapper>
   );

@@ -9,6 +9,7 @@ const IndexMainArticlesWrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
+  height: auto;
 `;
 
 const MainArticlesWrapper = styled.div`
@@ -41,11 +42,55 @@ const RecommendationWrapper = styled.div`
   position: sticky;
   top: 0;
   width: 170px;
+  overflow-y: auto;
+  height: 100%;
 `;
 
 const RecommendedText = styled.h3`
   font-size: 40px;
   margin: 20px 0 0 0;
+`;
+
+const Spinner = styled.span`
+  width: 48px;
+  height: 48px;
+  display: inline-block;
+  position: relative;
+
+  &::after,
+  &::before {
+    content: '';
+    box-sizing: border-box;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgb(0, 140, 117);
+    position: absolute;
+    left: 0;
+    top: 0;
+    animation: animloader 2s linear infinite;
+  }
+  &::after {
+    animation-delay: 1s;
+  }
+
+  @keyframes animloader {
+    0% {
+      transform: scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+`;
+
+const SpinnerWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  transform: translateY(-24px);
 `;
 
 const IndexMainArticles = ({
@@ -54,16 +99,19 @@ const IndexMainArticles = ({
   urls,
   imageLinks,
   categories,
+  numOfArticles,
+  setNumOfArticles,
+  infiniteScrollTrigger = null,
+  targetArticleIndex = null,
   ...rest
 }) => {
   const isMobile = useMediaQuery('(max-width: 1200px)');
-  const [numOfArticles, setNumOfArticles] = React.useState(0);
 
   React.useEffect(() => {
     if (isMobile) {
-      setNumOfArticles(24);
+      setNumOfArticles(titles.length);
     } else {
-      setNumOfArticles(16);
+      setNumOfArticles(titles.length - 5);
     }
   }, [isMobile]);
 
@@ -79,10 +127,14 @@ const IndexMainArticles = ({
                 imageLink={imageLinks[index]}
                 orientation={index % 2 == 0 ? 'left' : 'right'}
                 category={categories[index]}
+                id={`article-${index}`}
+                infiniteScrollTrigger={
+                  index == targetArticleIndex ? infiniteScrollTrigger : null
+                }
               />
             ))
           : titles.map((title, index) => {
-              if (index < numOfArticles) {
+              if (index < numOfArticles && (index < 21 || index > 25)) {
                 return (
                   <IndexMainArticle
                     title={title}
@@ -90,18 +142,27 @@ const IndexMainArticles = ({
                     imageLink={imageLinks[index]}
                     orientation={'left'}
                     category={null}
+                    id={`article-${index}`}
+                    infiniteScrollTrigger={
+                      index == targetArticleIndex ? infiniteScrollTrigger : null
+                    }
                   />
                 );
               }
             })}
+        {!categories && (
+          <SpinnerWrapper>
+            <Spinner />
+          </SpinnerWrapper>
+        )}
       </MainArticlesWrapper>
       {!categories && !isMobile && (
         <RecommendationWrapper>
           <RecommendedText>See also:</RecommendedText>
           <RecommendedArticles
-            articleTitles={titles.slice(16)}
-            articleLinks={urls.slice(16)}
-            articleThumbnails={rest.imageData.slice(16)}
+            articleTitles={titles.slice(21, 25)}
+            articleLinks={urls.slice(21, 25)}
+            articleThumbnails={rest.imageData.slice(21, 25)}
           />
         </RecommendationWrapper>
       )}

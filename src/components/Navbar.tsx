@@ -7,20 +7,28 @@ import { AiFillCaretLeft, AiFillCaretRight } from 'react-icons/ai';
 
 const NavWrapper = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 60px;
+  height: 120px;
   background-color: #dcdcdc;
   width: 100%;
+  padding: 16px 0 0 0;
+`;
+
+const NavTopContentWrapper = styled.div`
+  height: 50%;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const NavContentWrapper = styled.div`
-  height: 60px;
-  width: 74%;
+  height: 50%;
   display: flex;
-  margin: 0 350px;
+  margin: 0;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 `;
 
 const NavButtons = styled.button`
@@ -42,16 +50,15 @@ const NavButtons = styled.button`
 const ScrollingArea = styled.div`
   display: flex;
   justify-content: center;
-  width: 56%;
   position: relative;
   height: 100%;
 `;
 
 const LeftRightButtons = styled.button`
-  margin: 0 30px;
   width: 40px;
   height: 40px;
   border-radius: 40px;
+  margin: 0 14%;
   padding: 0;
   background-color: #c6c6c6;
   display: flex;
@@ -60,8 +67,13 @@ const LeftRightButtons = styled.button`
   border: none;
   transition: 0.3s ease-out;
   cursor: pointer;
+  z-index: 1;
   :hover {
     background-color: #b0b0b0;
+  }
+  display: block;
+  @media (max-width: 1200px) {
+    margin: 0 2%;
   }
 `;
 
@@ -74,23 +86,23 @@ const GroupWrapper = styled.div<{
 }>`
   ${(p) => {
     if (p.showGroup) {
-      return 'justify-self: center;';
+      return 'justify-self: center; z-index: 0; display: block;';
     } else {
       if (p.prevListNumber < p.listNumber) {
         if (p.groupNumber > p.listNumber) {
-          return 'transform: translateX(2000px);';
+          return 'transform: translateX(2000px); content-visibility:hidden;';
         }
-        return 'transform: translateX(-2000px);';
+        return 'transform: translateX(-2000px); content-visibility:hidden;';
       } else if (p.prevListNumber > p.listNumber) {
         if (p.groupNumber < p.listNumber) {
-          return 'transform: translateX(-2000px);';
+          return 'transform: translateX(-2000px); content-visibility:hidden;';
         }
-        return 'transform: translateX(2000px);';
+        return 'transform: translateX(2000px); content-visibility:hidden;';
       } else if (p.prevListNumber == p.listNumber) {
         if (p.listNumber == 2) {
-          return 'transform: translateX(-2000px);';
+          return 'transform: translateX(-2000px); content-visibility:hidden;';
         } else {
-          return 'transform: translateX(2000px);';
+          return 'transform: translateX(2000px); content-visibility:hidden;';
         }
       }
     }
@@ -102,6 +114,15 @@ const GroupWrapper = styled.div<{
   height: 100%;
   transition: 0.3s ease-out;
   width: auto;
+`;
+
+const Logo = styled.img`
+  align-self: center;
+  justify-self: center;
+  margin: 0 50px;
+  cursor: pointer;
+  z-index: 1;
+  height: 100%;
 `;
 
 const handleLeftArrow = (setListNumber, setPrevListNumber) => {
@@ -157,9 +178,13 @@ const Navbar = () => {
     secondCategoryList,
     thirdCategoryList,
   ];
-  console.log(prevListNumber, listNumber);
   return (
     <NavWrapper>
+      <NavTopContentWrapper>
+        <Link href="/">
+          <Logo src="/logo.svg" />
+        </Link>
+      </NavTopContentWrapper>
       <NavContentWrapper>
         <LeftRightButtons
           onClick={() => handleLeftArrow(setListNumber, setPrevListNumber)}

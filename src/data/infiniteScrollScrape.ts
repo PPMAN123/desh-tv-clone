@@ -5,11 +5,13 @@ import request from '../utils/request';
 import getTranslatedText from '../utils/getTranslatedText';
 import getImage from '../utils/getImage';
 
-const fetchCategoryPage = async (category) => {
-  const { data } = await request.get(`/data/desh-tv/${category}`);
+const fetchNewArticles = async (category, numOfScrolls) => {
+  const { data } = await request.get(
+    `/data/desh-tv/${category}?start=${numOfScrolls * 20}`
+  );
 
   const dom = cheerio.load(data);
-  const anchors = dom('.newsblock > a').slice(0, 25);
+  const anchors = dom('.newsblock > a').slice(1, 21);
 
   const urls: Array<string> = [];
   const titles = [];
@@ -78,12 +80,12 @@ const fetchCategoryPage = async (category) => {
   };
 };
 
-const fetchMockedCategoryPage = async (category) => {
+const fetchMockedNewArticles = async (category) => {
   let urls = [];
   let imageLinks = [];
   let translatedTitles = [];
   let imageData = [];
-  for (let i = 0; i < 24; i++) {
+  for (let i = 0; i < 25; i++) {
     urls.push(faker.internet.url());
     imageLinks.push(faker.image.imageUrl(750, 422));
     translatedTitles.push(faker.lorem.sentence(7));
@@ -99,4 +101,4 @@ const fetchMockedCategoryPage = async (category) => {
   };
 };
 
-export default fetchCategoryPage;
+export default fetchNewArticles;

@@ -2,6 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { ImCross } from 'react-icons/im';
 import { faker } from '@faker-js/faker';
+import Link from 'next/link';
+import { categoryList } from '../constants';
+import _ from 'lodash';
 
 const PopoutWrapper = styled.nav<{ openPopout: boolean }>`
   position: fixed;
@@ -10,12 +13,13 @@ const PopoutWrapper = styled.nav<{ openPopout: boolean }>`
   left: 0px;
   top: 0px;
   width: calc(100% - 32px);
-  height: 100vh;
+  height: 100%;
   background-color: #dcdcdc;
   z-index: 1;
   flex-direction: column;
   padding: 16px;
   transition: 0.7s ease-out;
+  overflow-y: scroll;
 `;
 
 const FirstRowWrapper = styled.div`
@@ -65,11 +69,18 @@ const CategoryButtons = styled.button`
   }
 `;
 
+const Logo = styled.img`
+  height: 100%;
+  cursor: pointer;
+`;
+
 const MobilePopoutMenu = ({ openPopout, changeOpenPopout }) => {
   return (
     <PopoutWrapper openPopout={openPopout}>
       <FirstRowWrapper>
-        <img src={faker.image.imageUrl(120, 70)} />
+        <Link href="/">
+          <Logo src="logo.svg" />
+        </Link>
         <CloseButton
           onClick={() => {
             changeOpenPopout((prev) => !prev);
@@ -79,12 +90,11 @@ const MobilePopoutMenu = ({ openPopout, changeOpenPopout }) => {
         </CloseButton>
       </FirstRowWrapper>
       <Divider />
-      <CategoryButtons>NATIONAL</CategoryButtons>
-      <CategoryButtons>POLITICS</CategoryButtons>
-      <CategoryButtons>INTERNATIONAL</CategoryButtons>
-      <CategoryButtons>CRICKET</CategoryButtons>
-      <CategoryButtons>ENTERTAINMENT</CategoryButtons>
-      <CategoryButtons>ECONOMY</CategoryButtons>
+      {categoryList.map((category) => (
+        <Link href={`/category/${category}`}>
+          <CategoryButtons>{_.upperCase(category)}</CategoryButtons>
+        </Link>
+      ))}
     </PopoutWrapper>
   );
 };

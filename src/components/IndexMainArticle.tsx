@@ -89,7 +89,15 @@ const StyledImage = styled.img`
   width: 100%;
 `;
 
-const IndexMainArticle = ({ title, url, imageLink, orientation, category }) => {
+const IndexMainArticle = ({
+  title,
+  url,
+  imageLink,
+  orientation,
+  category,
+  id,
+  infiniteScrollTrigger,
+}) => {
   const [image, setImage] = React.useState();
   React.useEffect(() => {
     if (imageLink) {
@@ -107,7 +115,11 @@ const IndexMainArticle = ({ title, url, imageLink, orientation, category }) => {
 
   return (
     <Link href={`/article${slug}`}>
-      <ArticleWrapper orientation={orientation}>
+      <ArticleWrapper
+        orientation={orientation}
+        id={id}
+        ref={infiniteScrollTrigger}
+      >
         {image && (
           <ImageFilter>
             <ArticleImage>

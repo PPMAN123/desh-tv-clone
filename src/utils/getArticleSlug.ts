@@ -1,6 +1,6 @@
 const getArticleSlug = (url) => {
   let newUrl = '';
-  if (url.includes('desh.tv')) {
+  if (url && url.includes('desh.tv')) {
     newUrl = url.substring(url.indexOf('tv') + 2);
   } else {
     newUrl = url;

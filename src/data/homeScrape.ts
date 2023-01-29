@@ -94,4 +94,4 @@ const fetchMockedHomePage = async () => {
   };
 };
 
-export default fetchMockedHomePage;
+export default fetchHomePage;
