@@ -6,6 +6,7 @@ import useMediaQuery from '../src/hooks/useMediaQuery';
 import MobileNav from '../src/components/MobileNav';
 import { gql } from 'graphql-request';
 import { client } from '../src/utils/graphqlRequest';
+
 const PageWrapper = styled.div``;
 
 export default function Home({ data }) {

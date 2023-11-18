@@ -73,7 +73,7 @@ const CategoryPage = ({ data, slug }) => {
 export async function getServerSideProps(context) {
   const data = await client.request(
     gql`
-      query MyQuery($equals: String = "", $take: Int = 10) {
+      query MyQuery($equals: String, $take: Int) {
         articles(
           where: { category: { name: { equals: $equals } } }
           take: $take

@@ -209,7 +209,7 @@ var lists = {
 var keystone_default = (0, import_core4.config)({
   db: {
     provider: "mysql",
-    url: process.env.DATABASE_URL ?? "mysql://ljuxk4qp2xuvll09n02p:pscale_pw_x3dxFxkRHAAu8En6bu6a9q4abpjepxT0KISvz2D1KKy@aws.connect.psdb.cloud/desh-tv-clone-backend?sslaccept=strict",
+    url: process.env.DATABASE_URL,
     additionalPrismaDatasourceProperties: {
       relationMode: "prisma"
     },
