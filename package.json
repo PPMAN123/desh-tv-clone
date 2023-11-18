@@ -3,17 +3,33 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "keystone:dev": "keystone dev",
+    "keystone:build": "keystone build",
+    "keystone:start": "keystone start"
   },
   "dependencies": {
+    "@apollo/client": "^3.8.6",
+    "@keystone-6/core": "^5.7.0",
+    "@keystone-6/document-renderer": "^1.1.2",
+    "@keystone-6/fields-document": "^8.0.2",
+    "@prisma/client": "^5.6.0",
     "axios": "^0.27.2",
     "babel-plugin-styled-components": "^2.0.7",
     "cheerio": "^1.0.0-rc.12",
     "cloudscraper": "^4.6.0",
+    "dotenv": "^16.0.3",
+    "graphql": "^16.8.1",
+    "graphql-request": "^6.1.0",
+    "graphql-yoga": "^5.0.0",
     "htmlparser2": "^8.0.1",
+    "keystone": "^4.2.1",
     "lingva-scraper": "^1.0.0",
     "lodash": "^4.17.21",
-    "next": "latest",
+    "moment": "^2.29.4",
+    "mysql2": "^3.1.2",
+    "next": "^12.2.5",
+    "next-auth": "^4.22.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-icons": "^4.6.0",
@@ -28,6 +44,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.7.1",
+    "prisma": "^5.6.0",
     "typescript": "^4.7.4"
   }
 }

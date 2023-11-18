@@ -5,20 +5,18 @@ import MobileNav from '../../src/components/MobileNav';
 import useMediaQuery from '../../src/hooks/useMediaQuery';
 import Navbar from '../../src/components/Navbar';
 import IndexMainArticles from '../../src/components/IndexMainArticles';
-import { capitalize } from 'lodash';
+import { capitalize, upperCase } from 'lodash';
 import useOnScreen from '../../src/hooks/useOnScreen';
 import fetchNewArticles from '../../src/data/infiniteScrollScrape';
+import { createAllArticles } from '../../src/utils/createAllArticles';
+import { client } from '../../src/utils/graphqlRequest';
+import { gql } from 'graphql-request';
 
 const PageWrapper = styled.div`
   font-family: Teko;
 `;
 
-const CategoryPage = ({ data }) => {
-  const [titles, setTitles] = React.useState(data.translatedTitles);
-  const [imageLinks, setImageLinks] = React.useState(data.imageLinks);
-  const [urls, setUrls] = React.useState(data.urls);
-  const [category, setCategory] = React.useState(data.category);
-  const [imageData, setImageData] = React.useState(data.imageData);
+const CategoryPage = ({ data, slug }) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const hideRecommendedArticles = useMediaQuery('(max-width: 1200px)');
   const [numOfArticles, setNumOfArticles] = React.useState(0);
@@ -28,50 +26,44 @@ const CategoryPage = ({ data }) => {
     React.useState(null);
   const isVisible = useOnScreen(infiniteScrollElement);
 
-  const onRefChange = React.useCallback((node) => {
-    if (node !== null) {
-      setInfiniteScrollElement(node);
-    }
-  }, []); // adjust deps
+  // const onRefChange = React.useCallback((node) => {
+  //   if (node !== null) {
+  //     setInfiniteScrollElement(node);
+  //   }
+  // }, []); // adjust deps
 
-  React.useEffect(() => {
-    if (hideRecommendedArticles) {
-      setTargetArticleIndex(titles.length - 6);
-    } else {
-      setTargetArticleIndex(titles.length - 14);
-    }
-  }, [titles]);
+  // React.useEffect(() => {
+  //   if (hideRecommendedArticles) {
+  //     setTargetArticleIndex(titles.length - 6);
+  //   } else {
+  //     setTargetArticleIndex(titles.length - 14);
+  //   }
+  // }, [titles]);
 
-  React.useEffect(() => {
-    console.log(isVisible);
-    if (isVisible) {
-      fetchNewArticles(category, numOfScrolls).then((data) => {
-        setTitles((prevTitles) => prevTitles.concat(data.translatedTitles));
-        setImageLinks((prevImageLinks) =>
-          prevImageLinks.concat(data.imageLinks)
-        );
-        setUrls((prevUrls) => prevUrls.concat(data.urls));
-        setImageData((prevImageData) => prevImageData.concat(data.imageData));
-      });
-      console.log(titles.length);
-      setNumOfScrolls((prevNumOfScrolls) => (prevNumOfScrolls += 1));
-      setNumOfArticles((prevNumOfArticles) => (prevNumOfArticles += 20));
-    }
-  }, [isVisible]);
+  // React.useEffect(() => {
+  //   if (isVisible) {
+  //     fetchNewArticles(category, numOfScrolls).then((data) => {
+  //       setTitles((prevTitles) => prevTitles.concat(data.translatedTitles));
+  //       setImageLinks((prevImageLinks) =>
+  //         prevImageLinks.concat(data.imageLinks)
+  //       );
+  //       setUrls((prevUrls) => prevUrls.concat(data.urls));
+  //       setImageData((prevImageData) => prevImageData.concat(data.imageData));
+  //     });
+  //     setNumOfScrolls((prevNumOfScrolls) => (prevNumOfScrolls += 1));
+  //     setNumOfArticles((prevNumOfArticles) => (prevNumOfArticles += 20));
+  //   }
+  // }, [isVisible]);
 
   return (
     <PageWrapper>
       {isMobile ? <MobileNav /> : <Navbar />}
       <IndexMainArticles
-        pageTitle={capitalize(category)}
-        titles={titles}
-        urls={urls}
-        imageLinks={imageLinks}
-        categories={null}
-        imageData={imageData}
+        pageTitle={upperCase(slug.replace('-', ' '))}
+        articles={data.articles}
+        categories
         numOfArticles={numOfArticles}
         setNumOfArticles={setNumOfArticles}
-        infiniteScrollTrigger={onRefChange}
         targetArticleIndex={targetArticleIndex}
       />
     </PageWrapper>
@@ -79,13 +71,35 @@ const CategoryPage = ({ data }) => {
 };
 
 export async function getServerSideProps(context) {
-  context.res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=10, stale-while-revalidate=59'
+  const data = await client.request(
+    gql`
+      query MyQuery($equals: String = "", $take: Int = 10) {
+        articles(
+          where: { category: { name: { equals: $equals } } }
+          take: $take
+        ) {
+          category {
+            name
+          }
+          id
+          title
+          slug
+          image_data
+        }
+      }
+    `,
+    {
+      equals: context.query.slug,
+      take: 20,
+    }
   );
 
-  const data = await fetchCategoryPage(context.params.slug);
-  return { props: { data } };
+  return {
+    props: {
+      data,
+      slug: context.query.slug,
+    },
+  };
 }
 
 export default CategoryPage;

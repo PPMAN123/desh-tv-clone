@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import getImage from '../utils/getImage';
 import Link from 'next/link';
 import getArticleSlug from '../utils/getArticleSlug';
+import { capitalize, upperCase } from 'lodash';
 
 const ArticleTitleWrapper = styled.h3<{ orientation: string }>`
   font-family: Teko;
@@ -61,6 +62,7 @@ const ArticleImage = styled.div`
   top: 0;
   left: 0;
   z-index: -1;
+  height: 100%;
 `;
 
 const ImageFilter = styled.div`
@@ -73,7 +75,7 @@ const ImageFilter = styled.div`
 
 const FilterDiv = styled.div`
   background: rgba(0, 0, 0, 0.05);
-  padding-top: calc(42200% / 750);
+  padding-top: 250px;
   width: 100%;
   z-index: 1;
   transition: 0.3s ease-out;
@@ -87,50 +89,39 @@ const ArticleTitle = styled.span`
 
 const StyledImage = styled.img`
   width: 100%;
+  height: 100%;
+  border-radius: 10px;
 `;
 
 const IndexMainArticle = ({
   title,
-  url,
-  imageLink,
+  slug,
+  imageData,
   orientation,
   category,
   id,
   infiniteScrollTrigger,
 }) => {
-  const [image, setImage] = React.useState();
-  React.useEffect(() => {
-    if (imageLink) {
-      getImage(imageLink).then((data) => {
-        setImage(data);
-      });
-    }
-  }, [imageLink]);
-
-  let slug = '';
-
-  if (url && category) {
-    slug = getArticleSlug(url);
-  }
-
   return (
-    <Link href={`/article${slug}`}>
+    <Link href={`${decodeURI(slug)}`}>
       <ArticleWrapper
         orientation={orientation}
         id={id}
         ref={infiniteScrollTrigger}
       >
-        {image && (
+        {imageData && (
           <ImageFilter>
             <ArticleImage>
-              <StyledImage src={image} />
+              <StyledImage src={imageData} />
             </ArticleImage>
             <FilterDiv />
           </ImageFilter>
         )}
         <ArticleTitleWrapper orientation={orientation}>
           {category && (
-            <ArticleCategory>{category.replace('-', ' ')}</ArticleCategory>
+            <ArticleCategory>
+              {capitalize(category.replace('-', ' '))}
+            </ArticleCategory>
           )}
           <ArticleTitle>{title}</ArticleTitle>
         </ArticleTitleWrapper>

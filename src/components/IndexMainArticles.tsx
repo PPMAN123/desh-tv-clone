@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import useMediaQuery from '../hooks/useMediaQuery';
 import IndexMainArticle from './IndexMainArticle';
 import RecommendedArticles from './RecommendedArticles';
+import { GetServerSideProps } from 'next';
 
 const IndexMainArticlesWrapper = styled.div`
   margin: 4vh auto 0 auto;
@@ -95,60 +96,52 @@ const SpinnerWrapper = styled.div`
 
 const IndexMainArticles = ({
   pageTitle,
-  titles,
-  urls,
-  imageLinks,
-  categories,
-  numOfArticles,
-  setNumOfArticles,
+  articles,
+  categories = false,
   infiniteScrollTrigger = null,
   targetArticleIndex = null,
   ...rest
 }) => {
   const isMobile = useMediaQuery('(max-width: 1200px)');
 
-  React.useEffect(() => {
-    if (isMobile) {
-      setNumOfArticles(titles.length);
-    } else {
-      setNumOfArticles(titles.length - 5);
-    }
-  }, [isMobile]);
-
   return (
     <IndexMainArticlesWrapper>
       <MainArticlesWrapper>
         <TopStories>{pageTitle}</TopStories>
         {categories
-          ? titles.map((title, index) => (
+          ? articles.map((article, index) => (
               <IndexMainArticle
-                title={title}
-                url={urls[index]}
-                imageLink={imageLinks[index]}
+                title={article.title}
+                slug={article.slug}
+                imageData={article.image_data}
                 orientation={index % 2 == 0 ? 'left' : 'right'}
-                category={categories[index]}
-                id={`article-${index}`}
+                category={article.category.name}
+                id={`article-${article.id}`}
                 infiniteScrollTrigger={
                   index == targetArticleIndex ? infiniteScrollTrigger : null
                 }
+                key={article.id}
               />
             ))
-          : titles.map((title, index) => {
-              if (index < numOfArticles && (index < 21 || index > 25)) {
-                return (
-                  <IndexMainArticle
-                    title={title}
-                    url={urls[index]}
-                    imageLink={imageLinks[index]}
-                    orientation={'left'}
-                    category={null}
-                    id={`article-${index}`}
-                    infiniteScrollTrigger={
-                      index == targetArticleIndex ? infiniteScrollTrigger : null
-                    }
-                  />
-                );
-              }
+          : articles.map((article, index) => {
+              return (
+                <IndexMainArticle
+                  title={article.title}
+                  slug={article.slug}
+                  imageData={article.image_data}
+                  orientation={'left'}
+                  category={
+                    article.category
+                      ? article.category.name
+                      : 'no category lulz'
+                  }
+                  id={`article-${article.id}`}
+                  infiniteScrollTrigger={
+                    index == targetArticleIndex ? infiniteScrollTrigger : null
+                  }
+                  key={article.id}
+                />
+              );
             })}
         {!categories && (
           <SpinnerWrapper>
@@ -156,7 +149,7 @@ const IndexMainArticles = ({
           </SpinnerWrapper>
         )}
       </MainArticlesWrapper>
-      {!categories && !isMobile && (
+      {/* {!categories && !isMobile && (
         <RecommendationWrapper>
           <RecommendedText>See also:</RecommendedText>
           <RecommendedArticles
@@ -165,7 +158,7 @@ const IndexMainArticles = ({
             articleThumbnails={rest.imageData.slice(21, 25)}
           />
         </RecommendationWrapper>
-      )}
+      )} */}
     </IndexMainArticlesWrapper>
   );
 };

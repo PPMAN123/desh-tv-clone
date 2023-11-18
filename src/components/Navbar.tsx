@@ -170,9 +170,9 @@ const Navbar = () => {
   const [listNumber, setListNumber] = React.useState(0);
   const [prevListNumber, setPrevListNumber] = React.useState(0);
   const [hasNotScrolled, setHasNotScrolled] = React.useState(true);
-  const firstCategoryList = categoryList.slice(0, 6);
-  const secondCategoryList = categoryList.slice(7, 14);
-  const thirdCategoryList = categoryList.slice(15);
+  const firstCategoryList = categoryList.slice(0, 5);
+  const secondCategoryList = categoryList.slice(6, 12);
+  const thirdCategoryList = categoryList.slice(13);
   const categoryLists = [
     firstCategoryList,
     secondCategoryList,
@@ -201,9 +201,10 @@ const Navbar = () => {
                 listNumber={listNumber}
                 hasNotScrolled={hasNotScrolled}
                 groupNumber={categoryListNumber}
+                key={categoryList.join()}
               >
                 {categoryList.map((category) => (
-                  <Link href={`/category/${category}`}>
+                  <Link href={`/category/${category}`} key={category}>
                     <NavButtons>{_.upperCase(category)}</NavButtons>
                   </Link>
                 ))}

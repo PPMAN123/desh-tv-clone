@@ -43,25 +43,20 @@ const RecommendedArticleTitle = styled.p`
   margin: 0;
 `;
 
-const RecommendedArticles = ({
-  articleTitles,
-  articleLinks,
-  articleThumbnails,
-}) => {
+const RecommendedArticles = ({ data }) => {
   return (
     <React.Fragment>
-      {articleTitles.map((articleTitles, i) => {
-        const slug = getArticleSlug(articleLinks[i]);
+      {data.map((article, i) => {
         return (
-          <Link href={`/article${slug}`}>
+          <Link href={`${article.slug}`} key={article.title}>
             <RecommendedArticle>
               <ImageFilter>
                 <RecommendedArticleImageWrapper>
-                  <RecommendedArticleImage src={articleThumbnails[i]} />
+                  <RecommendedArticleImage src={article.image_data} />
                 </RecommendedArticleImageWrapper>
                 <FilterDiv />
               </ImageFilter>
-              <RecommendedArticleTitle>{articleTitles}</RecommendedArticleTitle>
+              <RecommendedArticleTitle>{article.title}</RecommendedArticleTitle>
             </RecommendedArticle>
           </Link>
         );

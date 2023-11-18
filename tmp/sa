@@ -1,0 +1,1 @@
+'INSERT INTO recommended_articles(article_id, recommended_article_id) VALUES(18, 3) ON DUPLICATE KEY UPDATE'

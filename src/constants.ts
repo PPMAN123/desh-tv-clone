@@ -3,7 +3,7 @@ export const categoryList = [
   'politics',
   'international',
   'sports',
-  'entertainment',
+  'culture-and-entertainment',
   'economy',
   'crime',
   'health',
@@ -14,9 +14,14 @@ export const categoryList = [
   'lifestyle',
   'environment',
   'tourism',
-  'videos',
-  'desh-recipe',
   'feature',
   'special-report',
   'opinion',
+  'country-news',
+  'law-justice',
+  'entertainment',
+  'job',
+  'others',
 ];
+
+

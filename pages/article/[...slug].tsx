@@ -3,14 +3,19 @@ import React from 'react';
 import styled from 'styled-components';
 import MobileNav from '../../src/components/MobileNav';
 import Navbar from '../../src/components/Navbar';
-import RecommendedArticles from '../../src/components/RecommendedArticles';
-import fetchArticle from '../../src/data/articleScrape';
 import useMediaQuery from '../../src/hooks/useMediaQuery';
-import MobileRecommendedArticles from '../../src/components/MobileRecommendedArticles';
+import _ from 'lodash';
+import moment from 'moment';
+import createApolloClient from '../../apollo-client';
+import { gql } from '@apollo/client';
+import { DocumentRenderer } from '@keystone-6/document-renderer';
+import RecommendedArticles from '../../src/components/RecommendedArticles';
+import { client } from '../../src/utils/graphqlRequest';
 
 const PageWrapper = styled.div`
   font-family: Teko;
   display: flex;
+  flex-direction: column;
 `;
 
 const ContentWrapper = styled.div`
@@ -61,9 +66,7 @@ const Date = styled.span`
   font-size: 28px;
 `;
 
-const ArticleTextWrapper = styled.div``;
-
-const ArticleText = styled.p`
+const ArticleTextWrapper = styled.div`
   font-size: 34px;
   text-align: justify;
   @media (max-width: 768px) {
@@ -107,74 +110,93 @@ const MobileRecommendationGridWrapper = styled.div`
 `;
 
 const ArticlePage = ({ data }) => {
-  const router = useRouter();
-  const url = (router.query.slug as string[]) || [];
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isRecommendedOnBottom = useMediaQuery('(max-width: 1200px)');
-
   return (
     <PageWrapper>
       {isMobile ? <MobileNav /> : <Navbar />}
       <ContentWrapper>
         <ArticleWrapper>
           <TitleWrapper>
-            <Title>{data.translatedTitle}</Title>
+            <Title>{data.article.title}</Title>
           </TitleWrapper>
           <DateWrapper>
-            <Date>{data.translatedDate}</Date>
+            <Date>
+              {moment(data.article.translated_date).format(
+                'dddd, MMMM Do YYYY'
+              )}
+            </Date>
           </DateWrapper>
           <ArticleImageWrapper>
-            <ArticleImage src={data.articleImageData} />
+            <ArticleImage src={data.article.image_data} />
           </ArticleImageWrapper>
           <ArticleTextWrapper>
-            {data.translatedParagraphs &&
-              data.translatedParagraphs.map((paragraph, index) => {
-                if (index == data.translatedParagraphs.length - 1) {
-                  return <ArticleText>{paragraph}</ArticleText>;
-                } else {
-                  return (
-                    <ArticleText>
-                      &nbsp;&nbsp;&nbsp;&nbsp;{paragraph}
-                    </ArticleText>
-                  );
-                }
-              })}
+            <DocumentRenderer document={data.article.content.document} />
           </ArticleTextWrapper>
         </ArticleWrapper>
         {data && !isRecommendedOnBottom && (
           <RecommendationWrapper>
             <RecommendedText>See also:</RecommendedText>
-            <RecommendedArticles
-              articleTitles={data.translatedRecommendedArticleTitles}
-              articleLinks={data.recommendedArticleLinks}
-              articleThumbnails={data.recommendedArticleThumbailData}
-            />
+            <RecommendedArticles data={data.articles} />
           </RecommendationWrapper>
         )}
       </ContentWrapper>
-      {data && isRecommendedOnBottom && (
+      {/* {data && isRecommendedOnBottom && (
         <MobileRecommendationWrapper>
           <RecommendedText>See also:</RecommendedText>
           <MobileRecommendationGridWrapper>
             <MobileRecommendedArticles data={data} />
           </MobileRecommendationGridWrapper>
         </MobileRecommendationWrapper>
-      )}
+      )} */}
     </PageWrapper>
   );
 };
 
 export async function getServerSideProps(context) {
-  context.res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=10, stale-while-revalidate=59'
+  const data = await client.request(
+    gql`
+      query Query(
+        $where: ArticleWhereUniqueInput!
+        $articlesWhere2: ArticleWhereInput!
+        $take: Int
+      ) {
+        article(where: $where) {
+          translated_date
+          title
+          slug
+          image_data
+          created_at
+          content {
+            document
+          }
+          category {
+            slug
+            name
+          }
+        }
+        articles(where: $articlesWhere2, take: $take) {
+          slug
+          title
+          image_data
+        }
+      }
+    `,
+    {
+      where: {
+        slug: context.resolvedUrl,
+      },
+      articlesWhere2: {
+        slug: {
+          not: {
+            equals: context.resolvedUrl,
+          },
+        },
+      },
+      take: 6,
+    }
   );
 
-  const fetchUrl = `https://desh.tv${context.resolvedUrl.substring(
-    context.resolvedUrl.indexOf('article') + 7
-  )}`;
-
-  const data = await fetchArticle(fetchUrl);
   return { props: { data } };
 }
 
