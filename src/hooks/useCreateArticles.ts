@@ -35,6 +35,7 @@ export default function useCreateArticles(
         },
         {
           signal,
+          headers: { 'Access-Control-Allow-Origin': '*' },
         }
       )
       .then(({ data }) => {

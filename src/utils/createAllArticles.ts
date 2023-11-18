@@ -24,6 +24,7 @@ export const createAllArticles = async (
         },
         {
           signal,
+          headers: { 'Access-Control-Allow-Origin': '*' },
         }
       )
       .then(({ data }) => {
