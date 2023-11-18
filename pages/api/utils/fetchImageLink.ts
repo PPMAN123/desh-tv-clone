@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import createError from './createError';
+import { ErrorStage } from '../enums';
 
 export async function fetchImageLink({ articleUrl, statuses }) {
   let encodedUrl;
@@ -22,7 +23,12 @@ export async function fetchImageLink({ articleUrl, statuses }) {
       'https://www.desh.tv' + dom('.dtl_img_section .img img').attr('src');
     return imageLink;
   } catch (err) {
-    createError(statuses, 'cantFetchImageLink', articleUrl);
+    createError(
+      statuses,
+      'cantFetchImageLink',
+      articleUrl,
+      ErrorStage.Fetching
+    );
     console.log('fetch image error', err);
   }
 }
