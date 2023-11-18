@@ -6,7 +6,6 @@ import Navbar from '../../src/components/Navbar';
 import useMediaQuery from '../../src/hooks/useMediaQuery';
 import _ from 'lodash';
 import moment from 'moment';
-import createApolloClient from '../../apollo-client';
 import { gql } from '@apollo/client';
 import { DocumentRenderer } from '@keystone-6/document-renderer';
 import RecommendedArticles from '../../src/components/RecommendedArticles';
