@@ -1,13 +1,12 @@
-import { useRouter } from 'next/router';
 import React from 'react';
 import styled from 'styled-components';
 import MobileNav from '../../src/components/MobileNav';
 import Navbar from '../../src/components/Navbar';
 import useMediaQuery from '../../src/hooks/useMediaQuery';
-import _ from 'lodash';
+import {unescape} from 'lodash';
 import moment from 'moment';
 import { gql } from '@apollo/client';
-import { DocumentRenderer } from '@keystone-6/document-renderer';
+import { DocumentRenderer, DocumentRendererProps } from '@keystone-6/document-renderer';
 import RecommendedArticles from '../../src/components/RecommendedArticles';
 import { client } from '../../src/utils/graphqlRequest';
 
@@ -111,13 +110,23 @@ const MobileRecommendationGridWrapper = styled.div`
 const ArticlePage = ({ data }) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isRecommendedOnBottom = useMediaQuery('(max-width: 1200px)');
+  const modifiedDocument = Object.keys(data.article.content.document).map((key)=>{
+    return {
+      type: data.article.content.document[key].type,
+      children: data.article.content.document[key].children.map((child)=>{
+        child.text = unescape(child.text);
+        return child;
+      })
+    }
+  })
+
   return (
     <PageWrapper>
       {isMobile ? <MobileNav /> : <Navbar />}
       <ContentWrapper>
         <ArticleWrapper>
           <TitleWrapper>
-            <Title>{data.article.title}</Title>
+            <Title>{unescape(data.article.title)}</Title>
           </TitleWrapper>
           <DateWrapper>
             <Date>
@@ -130,7 +139,7 @@ const ArticlePage = ({ data }) => {
             <ArticleImage src={data.article.image_data} />
           </ArticleImageWrapper>
           <ArticleTextWrapper>
-            <DocumentRenderer document={data.article.content.document} />
+            <DocumentRenderer document={modifiedDocument} />
           </ArticleTextWrapper>
         </ArticleWrapper>
         {data && !isRecommendedOnBottom && (
