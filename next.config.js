@@ -9,10 +9,10 @@ module.exports = () => {
         source: '/data/translate/:path*',
         destination: 'https://desh.tv/:path*',
       },
-      {
-        source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_HOST_URL}/:path*`
-      }
+      // {
+      //   source: '/api/:path*',
+      //   destination: `${process.env.NEXT_PUBLIC_HOST_URL}/:path*`
+      // }
     ];
   };
   return {

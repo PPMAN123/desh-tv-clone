@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 const options = {
+  secret: process.env.NEXT_AUTH_SECRET,
   providers: [
     Credentials({
       name: 'HTTP',

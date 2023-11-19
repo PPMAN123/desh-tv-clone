@@ -1,9 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import getImage from '../utils/getImage';
 import Link from 'next/link';
-import getArticleSlug from '../utils/getArticleSlug';
-import { capitalize, upperCase } from 'lodash';
+import { capitalize, unescape } from 'lodash';
 
 const ArticleTitleWrapper = styled.h3<{ orientation: string }>`
   font-family: Teko;
@@ -123,7 +121,7 @@ const IndexMainArticle = ({
               {capitalize(category.replace('-', ' '))}
             </ArticleCategory>
           )}
-          <ArticleTitle>{title}</ArticleTitle>
+          <ArticleTitle>{unescape(title)}</ArticleTitle>
         </ArticleTitleWrapper>
       </ArticleWrapper>
     </Link>

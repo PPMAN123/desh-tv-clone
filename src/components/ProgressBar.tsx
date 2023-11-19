@@ -38,7 +38,7 @@ const ProgressBar = ({ bgcolor, completed, showBar }) => {
         bgcolor={bgcolor}
         showBar={showBar}
       >
-        <StyledLabel showBar={showBar}>{`${completed}%`}</StyledLabel>
+        <StyledLabel showBar={showBar}>{`${Math.round(completed)}%`}</StyledLabel>
       </StyledFiller>
     </StyledContainer>
   );
