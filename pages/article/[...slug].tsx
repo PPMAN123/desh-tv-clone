@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import MobileNav from '../../src/components/MobileNav';
 import Navbar from '../../src/components/Navbar';
 import useMediaQuery from '../../src/hooks/useMediaQuery';
-import {unescape} from 'lodash';
+import { unescape } from 'lodash';
 import moment from 'moment';
 import { gql } from '@apollo/client';
-import { DocumentRenderer, DocumentRendererProps } from '@keystone-6/document-renderer';
+import {
+  DocumentRenderer,
+  DocumentRendererProps,
+} from '@keystone-6/document-renderer';
 import RecommendedArticles from '../../src/components/RecommendedArticles';
 import { client } from '../../src/utils/graphqlRequest';
+import MobileRecommendedArticles from '../../src/components/MobileRecommendedArticles';
+import { ArticleData, Articles } from '../../src/types/data';
+import _ from 'lodash';
 
 const PageWrapper = styled.div`
   font-family: Teko;
@@ -107,18 +113,38 @@ const MobileRecommendationGridWrapper = styled.div`
   flex-wrap: wrap;
 `;
 
-const ArticlePage = ({ data }) => {
+const ArticlePage = ({
+  data,
+}: {
+  data: {
+    article: ArticleData;
+    articles: Articles;
+  };
+}) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isRecommendedOnBottom = useMediaQuery('(max-width: 1200px)');
-  const modifiedDocument = Object.keys(data.article.content.document).map((key)=>{
-    return {
-      type: data.article.content.document[key].type,
-      children: data.article.content.document[key].children.map((child)=>{
-        child.text = unescape(child.text);
-        return child;
-      })
+  const [modifiedDocument, setModifiedDocument] = useState([]);
+
+  useEffect(() => {
+    if (data.article.content.document) {
+      setModifiedDocument(() => {
+        const temp = Object.keys(data.article.content.document).map((key) => {
+          return {
+            type: data.article.content.document[key].type,
+            children: data.article.content.document[key].children.map(
+              (child) => {
+                child.text = _.unescape(child.text);
+                child.key = key;
+                return child;
+              }
+            ),
+          };
+        });
+
+        return temp;
+      });
     }
-  })
+  }, [data.article]);
 
   return (
     <PageWrapper>
@@ -126,13 +152,14 @@ const ArticlePage = ({ data }) => {
       <ContentWrapper>
         <ArticleWrapper>
           <TitleWrapper>
-            <Title>{unescape(data.article.title)}</Title>
+            {data.article && <Title>{_.unescape(data.article.title)}</Title>}
           </TitleWrapper>
           <DateWrapper>
             <Date>
-              {moment(data.article.translated_date).format(
-                'dddd, MMMM Do YYYY'
-              )}
+              {data.article &&
+                moment(data.article.translated_date).format(
+                  'dddd, MMMM Do YYYY'
+                )}
             </Date>
           </DateWrapper>
           <ArticleImageWrapper>
@@ -149,14 +176,14 @@ const ArticlePage = ({ data }) => {
           </RecommendationWrapper>
         )}
       </ContentWrapper>
-      {/* {data && isRecommendedOnBottom && (
+      {data && isRecommendedOnBottom && (
         <MobileRecommendationWrapper>
           <RecommendedText>See also:</RecommendedText>
           <MobileRecommendationGridWrapper>
-            <MobileRecommendedArticles data={data} />
+            <MobileRecommendedArticles data={data.articles} />
           </MobileRecommendationGridWrapper>
         </MobileRecommendationWrapper>
-      )} */}
+      )}
     </PageWrapper>
   );
 };
@@ -183,7 +210,11 @@ export async function getServerSideProps(context) {
             name
           }
         }
-        articles(where: $articlesWhere2, take: $take) {
+        articles(
+          where: $articlesWhere2
+          take: $take
+          orderBy: { created_at: desc }
+        ) {
           slug
           title
           image_data

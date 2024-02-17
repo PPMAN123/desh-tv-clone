@@ -1,7 +1,8 @@
-import Link from 'next/link';
 import React from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
-import getArticleSlug from '../utils/getArticleSlug';
+import { Articles } from '../types/data';
+import _ from 'lodash';
 
 const RecommendedArticle = styled.div`
   display: flex;
@@ -50,31 +51,24 @@ const RecommendedArticleTitle = styled.p`
   margin: 0;
 `;
 
-const MobileRecommendedArticles = ({ data }) => {
+const MobileRecommendedArticles = ({ data }: { data: Articles }) => {
   return (
     <React.Fragment>
-      {data.translatedRecommendedArticleTitles.map(
-        (translatedRecommendedArticleTitles, i) => {
-          const slug = getArticleSlug(data.recommendedArticleLinks[i]);
-          return (
-            <Link href={`/article${slug}`}>
-              <RecommendedArticle>
-                <ImageFilter>
-                  <RecommendedArticleImageWrapper>
-                    <RecommendedArticleImage
-                      src={data.recommendedArticleThumbailData[i]}
-                    />
-                  </RecommendedArticleImageWrapper>
-                  <FilterDiv />
-                </ImageFilter>
-                <RecommendedArticleTitle>
-                  {translatedRecommendedArticleTitles}
-                </RecommendedArticleTitle>
-              </RecommendedArticle>
-            </Link>
-          );
-        }
-      )}
+      {data.map((article) => (
+        <Link href={`/article${article.slug}`} key={article.title}>
+          <RecommendedArticle>
+            <ImageFilter>
+              <RecommendedArticleImageWrapper>
+                <RecommendedArticleImage src={article.image_data} />
+              </RecommendedArticleImageWrapper>
+              <FilterDiv />
+            </ImageFilter>
+            <RecommendedArticleTitle>
+              {_.unescape(article.title)}
+            </RecommendedArticleTitle>
+          </RecommendedArticle>
+        </Link>
+      ))}
     </React.Fragment>
   );
 };

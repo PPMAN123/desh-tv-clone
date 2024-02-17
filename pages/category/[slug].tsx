@@ -1,70 +1,87 @@
-import React from 'react';
-import fetchCategoryPage from '../../src/data/categoryScrape';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import MobileNav from '../../src/components/MobileNav';
 import useMediaQuery from '../../src/hooks/useMediaQuery';
 import Navbar from '../../src/components/Navbar';
 import IndexMainArticles from '../../src/components/IndexMainArticles';
-import { capitalize, upperCase } from 'lodash';
+import { upperCase } from 'lodash';
 import useOnScreen from '../../src/hooks/useOnScreen';
-import fetchNewArticles from '../../src/data/infiniteScrollScrape';
-import { createAllArticles } from '../../src/utils/createAllArticles';
 import { client } from '../../src/utils/graphqlRequest';
 import { gql } from 'graphql-request';
+import { Articles } from '../../src/types/data';
 
 const PageWrapper = styled.div`
   font-family: Teko;
 `;
 
-const CategoryPage = ({ data, slug }) => {
+const CategoryPage = ({
+  data,
+  slug,
+}: {
+  data: {
+    articles: Articles;
+  };
+  slug: string;
+}) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const hideRecommendedArticles = useMediaQuery('(max-width: 1200px)');
-  const [numOfArticles, setNumOfArticles] = React.useState(0);
-  const [numOfScrolls, setNumOfScrolls] = React.useState(1);
-  const [targetArticleIndex, setTargetArticleIndex] = React.useState(0);
-  const [infiniteScrollElement, setInfiniteScrollElement] =
-    React.useState(null);
-  const isVisible = useOnScreen(infiniteScrollElement);
+  const ref = useRef<HTMLDivElement>(null);
+  const isVisible = useOnScreen(ref);
+  const [articles, setArticles] = useState({
+    skipCount: 0,
+    articles: data.articles,
+  });
 
-  // const onRefChange = React.useCallback((node) => {
-  //   if (node !== null) {
-  //     setInfiniteScrollElement(node);
-  //   }
-  // }, []); // adjust deps
+  useEffect(() => {
+    if (isVisible) {
+      console.log('ON SCREEN');
+      client
+        .request(
+          gql`
+            query MyQuery($skip: Int = 10, $equals: String = "") {
+              articles(
+                skip: $skip
+                take: 10
+                where: { category: { name: { equals: $equals } } }
+                orderBy: { created_at: desc }
+              ) {
+                created_at
+                id
+                image_data
+                slug
+                title
+                category {
+                  name
+                }
+              }
+            }
+          `,
+          {
+            skip: (articles.skipCount + 1) * 10,
+            equals: slug,
+          }
+        )
+        .then((newData: { articles: Articles }) => {
+          setArticles((prevArticles) => {
+            const value = {
+              skipCount: prevArticles.skipCount + 1,
+              articles: [...prevArticles.articles, ...newData.articles],
+            };
 
-  // React.useEffect(() => {
-  //   if (hideRecommendedArticles) {
-  //     setTargetArticleIndex(titles.length - 6);
-  //   } else {
-  //     setTargetArticleIndex(titles.length - 14);
-  //   }
-  // }, [titles]);
-
-  // React.useEffect(() => {
-  //   if (isVisible) {
-  //     fetchNewArticles(category, numOfScrolls).then((data) => {
-  //       setTitles((prevTitles) => prevTitles.concat(data.translatedTitles));
-  //       setImageLinks((prevImageLinks) =>
-  //         prevImageLinks.concat(data.imageLinks)
-  //       );
-  //       setUrls((prevUrls) => prevUrls.concat(data.urls));
-  //       setImageData((prevImageData) => prevImageData.concat(data.imageData));
-  //     });
-  //     setNumOfScrolls((prevNumOfScrolls) => (prevNumOfScrolls += 1));
-  //     setNumOfArticles((prevNumOfArticles) => (prevNumOfArticles += 20));
-  //   }
-  // }, [isVisible]);
+            return value;
+          });
+        });
+    }
+  }, [isVisible]);
 
   return (
     <PageWrapper>
       {isMobile ? <MobileNav /> : <Navbar />}
       <IndexMainArticles
         pageTitle={upperCase(slug.replace('-', ' '))}
-        articles={data.articles}
+        articles={articles.articles}
+        spinnerRef={ref}
         categories
-        numOfArticles={numOfArticles}
-        setNumOfArticles={setNumOfArticles}
-        targetArticleIndex={targetArticleIndex}
       />
     </PageWrapper>
   );
@@ -90,7 +107,7 @@ export async function getServerSideProps(context) {
     `,
     {
       equals: context.query.slug,
-      take: 20,
+      take: 10,
     }
   );
 

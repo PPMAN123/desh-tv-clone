@@ -79,7 +79,7 @@ const MobilePopoutMenu = ({ openPopout, changeOpenPopout }) => {
     <PopoutWrapper openPopout={openPopout}>
       <FirstRowWrapper>
         <Link href="/">
-          <Logo src="logo.svg" />
+          <Logo src="/logo.svg" />
         </Link>
         <CloseButton
           onClick={() => {
@@ -91,7 +91,7 @@ const MobilePopoutMenu = ({ openPopout, changeOpenPopout }) => {
       </FirstRowWrapper>
       <Divider />
       {categoryList.map((category) => (
-        <Link href={`/category/${category}`}>
+        <Link href={`/category/${category}`} key={category}>
           <CategoryButtons>{_.upperCase(category)}</CategoryButtons>
         </Link>
       ))}

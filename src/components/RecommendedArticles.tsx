@@ -2,6 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import getArticleSlug from '../utils/getArticleSlug';
+import _ from 'lodash';
 
 const RecommendedArticle = styled.div`
   display: flex;
@@ -56,7 +57,9 @@ const RecommendedArticles = ({ data }) => {
                 </RecommendedArticleImageWrapper>
                 <FilterDiv />
               </ImageFilter>
-              <RecommendedArticleTitle>{article.title}</RecommendedArticleTitle>
+              <RecommendedArticleTitle>
+                {_.unescape(article.title)}
+              </RecommendedArticleTitle>
             </RecommendedArticle>
           </Link>
         );

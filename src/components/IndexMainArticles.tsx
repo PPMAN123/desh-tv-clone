@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import useMediaQuery from '../hooks/useMediaQuery';
 import IndexMainArticle from './IndexMainArticle';
 import RecommendedArticles from './RecommendedArticles';
 import { GetServerSideProps } from 'next';
+import useOnScreen from '../hooks/useOnScreen';
 
 const IndexMainArticlesWrapper = styled.div`
   margin: 4vh auto 0 auto;
@@ -97,6 +98,7 @@ const SpinnerWrapper = styled.div`
 const IndexMainArticles = ({
   pageTitle,
   articles,
+  spinnerRef,
   categories = false,
   infiniteScrollTrigger = null,
   targetArticleIndex = null,
@@ -108,46 +110,45 @@ const IndexMainArticles = ({
     <IndexMainArticlesWrapper>
       <MainArticlesWrapper>
         <TopStories>{pageTitle}</TopStories>
-        {categories
-          ? articles.map((article, index) => (
-              <IndexMainArticle
-                title={article.title}
-                slug={article.slug}
-                imageData={article.image_data}
-                orientation={index % 2 == 0 ? 'left' : 'right'}
-                category={article.category.name}
-                id={`article-${article.id}`}
-                infiniteScrollTrigger={
-                  index == targetArticleIndex ? infiniteScrollTrigger : null
-                }
-                key={article.id}
-              />
-            ))
-          : articles.map((article, index) => {
-              return (
+        {articles &&
+          (categories
+            ? articles.map((article, index) => (
                 <IndexMainArticle
                   title={article.title}
                   slug={article.slug}
                   imageData={article.image_data}
-                  orientation={'left'}
-                  category={
-                    article.category
-                      ? article.category.name
-                      : 'no category lulz'
-                  }
+                  orientation={index % 2 == 0 ? 'left' : 'right'}
+                  category={article.category.name}
                   id={`article-${article.id}`}
                   infiniteScrollTrigger={
                     index == targetArticleIndex ? infiniteScrollTrigger : null
                   }
                   key={article.id}
                 />
-              );
-            })}
-        {!categories && (
-          <SpinnerWrapper>
-            <Spinner />
-          </SpinnerWrapper>
-        )}
+              ))
+            : articles.map((article, index) => {
+                return (
+                  <IndexMainArticle
+                    title={article.title}
+                    slug={article.slug}
+                    imageData={article.image_data}
+                    orientation={'left'}
+                    category={
+                      article.category
+                        ? article.category.name
+                        : 'no category lulz'
+                    }
+                    id={`article-${article.id}`}
+                    infiniteScrollTrigger={
+                      index == targetArticleIndex ? infiniteScrollTrigger : null
+                    }
+                    key={article.id}
+                  />
+                );
+              }))}
+        <SpinnerWrapper ref={spinnerRef}>
+          <Spinner />
+        </SpinnerWrapper>
       </MainArticlesWrapper>
       {/* {!categories && !isMobile && (
         <RecommendationWrapper>

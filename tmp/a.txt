@@ -1,0 +1,1 @@
+npx local-ssl-proxy --key cert.key --cert cert.crt --source 3001 --target 3000 
