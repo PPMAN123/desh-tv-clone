@@ -1,0 +1,10 @@
+// id: number
+// Slug: string
+// deshYesCount: number
+// deshNoCount: number
+// deshNoCommentCount: number
+// deshTotalVotesCount: number
+// yesCount: number
+// noCount: number
+// noCommentCount: number
+// TotalVotes: number
