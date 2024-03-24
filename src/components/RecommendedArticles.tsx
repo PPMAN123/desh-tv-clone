@@ -41,7 +41,7 @@ const RecommendedArticleImageWrapper = styled.div`
 `;
 
 const RecommendedArticleTitle = styled.p`
-  margin: 0;
+  margin: 20px 0 0 0;
 `;
 
 const RecommendedArticles = ({ data }) => {

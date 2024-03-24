@@ -15,7 +15,7 @@ import { lists } from './src/keystone/schema';
 
 export default config({
   db: {
-    provider: 'mysql',
+    provider: 'postgresql',
     url: process.env.DATABASE_URL,
     additionalPrismaDatasourceProperties: {
       relationMode: 'prisma',

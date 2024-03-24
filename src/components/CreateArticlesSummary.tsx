@@ -56,6 +56,7 @@ const CreateArticlesSummary = ({ statuses }) => {
 
   console.log('Fetching Errors: ', fetchingErrors);
   console.log('Creation Errors: ', creationErrors);
+  // console.log('statuses', statuses);
 
   // errorMap = {
   //   fetchingErrors: {
@@ -76,7 +77,7 @@ const CreateArticlesSummary = ({ statuses }) => {
                 <b>Total Created Articles: {statuses.completed}</b>
               </div>
               <div>Total Attempted Articles {statuses.attempts}</div>
-              {statuses.creationErrors > 0 && statuses.fetchingErrors > 0 && (
+              {(statuses.creationErrors > 0 || statuses.fetchingErrors) > 0 && (
                 <AccordionTab labelName="Errors">
                   <div>
                     <b>Total Errors {Object.keys(statuses.errors).length} </b>

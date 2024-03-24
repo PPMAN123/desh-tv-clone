@@ -32,7 +32,7 @@ __export(keystone_exports, {
   default: () => keystone_default
 });
 module.exports = __toCommonJS(keystone_exports);
-var import_core4 = require("@keystone-6/core");
+var import_core5 = require("@keystone-6/core");
 
 // src/keystone/schemas/user.ts
 var import_core = require("@keystone-6/core");
@@ -104,7 +104,7 @@ var article_default = (0, import_core2.list)({
     image_data: (0, import_fields2.text)({
       db: {
         //@ts-ignore
-        nativeType: "LongText",
+        nativeType: "Text",
         isNullable: true
       },
       hooks: {
@@ -198,17 +198,156 @@ var category_default = (0, import_core3.list)({
   }
 });
 
+// src/keystone/schemas/poll.ts
+var import_core4 = require("@keystone-6/core");
+var import_access4 = require("@keystone-6/core/access");
+var import_axios2 = __toESM(require("axios"));
+var import_node_fs2 = __toESM(require("node:fs"));
+var import_fields4 = require("@keystone-6/core/fields");
+var import_dotenv2 = __toESM(require("dotenv"));
+import_dotenv2.default.config();
+function buildSlug2(input) {
+  return "/poll/" + input.trim().toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-").substring(0, Math.min(input.length, 374));
+}
+var poll_default = (0, import_core4.list)({
+  access: import_access4.allowAll,
+  fields: {
+    slug: (0, import_fields4.text)({
+      hooks: {
+        resolveInput: ({ operation, resolvedData, inputData }) => {
+          if (operation === "create" && !inputData.slug) {
+            return buildSlug2(inputData.title);
+          }
+          return resolvedData.slug;
+        }
+      },
+      ui: {
+        createView: {
+          fieldMode: "hidden"
+        }
+      },
+      db: {
+        nativeType: "VarChar(380)"
+      },
+      isIndexed: "unique"
+    }),
+    image: (0, import_fields4.image)({ storage: "my_images" }),
+    image_data: (0, import_fields4.text)({
+      db: {
+        //@ts-ignore
+        nativeType: "Text",
+        isNullable: true
+      },
+      hooks: {
+        resolveInput: async ({ operation, resolvedData, inputData, item }) => {
+          if (!resolvedData.image_data && resolvedData.image.id) {
+            console.log(resolvedData.image);
+            const { data } = await import_axios2.default.get(
+              `${process.env.BASE_URL}/images/${resolvedData.image.id}.${resolvedData.image.extension}`,
+              {
+                responseEncoding: "base64"
+              }
+            );
+            const imageBase64 = `data:image/${resolvedData.image.extension == "jpg" ? "jpeg" : resolvedData.image.extension};base64,` + data;
+            import_node_fs2.default.writeFile("./base64.txt", imageBase64, (err) => {
+              if (err) {
+                console.log(err);
+              }
+            });
+            return imageBase64;
+          } else if (item) {
+            return item.image_data;
+          }
+          return null;
+        }
+      },
+      ui: {
+        createView: {
+          fieldMode: "hidden"
+        }
+      },
+      validation: {
+        isRequired: false
+      }
+    }),
+    title: (0, import_fields4.text)({
+      isIndexed: "unique",
+      validation: { isRequired: true }
+    }),
+    translated_date: (0, import_fields4.timestamp)({ validation: { isRequired: true } }),
+    created_at: (0, import_fields4.timestamp)({
+      defaultValue: { kind: "now" },
+      validation: { isRequired: true }
+    }),
+    yes_count: (0, import_fields4.integer)({
+      defaultValue: 0,
+      validation: { isRequired: true },
+      ui: {
+        createView: {
+          fieldMode: "hidden"
+        }
+      }
+    }),
+    no_count: (0, import_fields4.integer)({
+      defaultValue: 0,
+      validation: { isRequired: true },
+      ui: {
+        createView: {
+          fieldMode: "hidden"
+        }
+      }
+    }),
+    no_comment_count: (0, import_fields4.integer)({
+      defaultValue: 0,
+      validation: { isRequired: true },
+      ui: {
+        createView: {
+          fieldMode: "hidden"
+        }
+      }
+    }),
+    desh_yes_count: (0, import_fields4.integer)({
+      defaultValue: 0,
+      validation: { isRequired: false },
+      ui: {
+        createView: {
+          fieldMode: "hidden"
+        }
+      }
+    }),
+    desh_no_count: (0, import_fields4.integer)({
+      defaultValue: 0,
+      validation: { isRequired: false },
+      ui: {
+        createView: {
+          fieldMode: "hidden"
+        }
+      }
+    }),
+    desh_no_comment_count: (0, import_fields4.integer)({
+      defaultValue: 0,
+      validation: { isRequired: false },
+      ui: {
+        createView: {
+          fieldMode: "hidden"
+        }
+      }
+    })
+  }
+});
+
 // src/keystone/schema.ts
 var lists = {
   User: user_default,
   Article: article_default,
-  Category: category_default
+  Category: category_default,
+  Poll: poll_default
 };
 
 // keystone.ts
-var keystone_default = (0, import_core4.config)({
+var keystone_default = (0, import_core5.config)({
   db: {
-    provider: "mysql",
+    provider: "postgresql",
     url: process.env.DATABASE_URL,
     additionalPrismaDatasourceProperties: {
       relationMode: "prisma"

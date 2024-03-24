@@ -1,11 +1,7 @@
 import { list } from '@keystone-6/core';
 import { allowAll } from '@keystone-6/core/access';
 
-import {
-  text,
-  relationship,
-  integer,
-} from '@keystone-6/core/fields';
+import { text, relationship, integer } from '@keystone-6/core/fields';
 
 export default list({
   // WARNING
@@ -16,8 +12,8 @@ export default list({
 
   // this is the fields for our Post list
   fields: {
-    name: text({validation: {isRequired: true}}),
-    slug: text({validation: {isRequired: true}}),
+    name: text({ validation: { isRequired: true } }),
+    slug: text({ validation: { isRequired: true } }),
 
     // with this field, you can set a User as the author for a Post
     articles: relationship({
@@ -32,4 +28,4 @@ export default list({
       many: true,
     }),
   },
-})
+});

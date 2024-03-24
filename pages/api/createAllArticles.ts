@@ -5,12 +5,14 @@ import _, { attempt } from 'lodash';
 import { createArticle } from './utils/createArticle';
 import createError from './utils/createError';
 import { ErrorStage, ErrorType } from './enums';
+import { PrismaClient } from '@prisma/client';
 
-const mysql = require('mysql2/promise');
+// const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 export default async function handler(req, res) {
-  let data, connection;
+  let data;
+  const prisma = new PrismaClient();
   const statuses = {
     completed: 0,
     attempts: 0,
@@ -21,7 +23,8 @@ export default async function handler(req, res) {
     },
   };
   try {
-    connection = await mysql.createConnection(process.env.DATABASE_URL);
+    // connection = await mysql.createConnection(process.env.DATABASE_URL);
+    await prisma.$connect();
     ({ data } = await axios.get(req.body.pageUrl, {
       headers: { 'Access-Control-Allow-Origin': '*' },
       baseURL: process.env.NEXT_PUBLIC_HOST_URL,
@@ -81,7 +84,7 @@ export default async function handler(req, res) {
           article.translatedParagraphs,
           article.recommendedArticleSlugs,
           false,
-          connection,
+          prisma,
           article.articleUrl,
           statuses
         )
@@ -104,15 +107,18 @@ export default async function handler(req, res) {
       });
       createArticlePromises.push(createArticlePromise);
     });
+
     const createArticleStatuses = await Promise.all(createArticlePromises);
 
-    connection.end();
+    // connection.end();
+    await prisma.$disconnect();
 
     // console.log('CREATE ARTICLE STATUS', createArticleStatuses);
     res.status(200).json({ statuses });
   } catch (error) {
     console.log('WE FOUND WHERE THE ERROR MIGHT BE', error);
-    connection.end();
+    // connection.end();
+    await prisma.$disconnect();
     res.status(400);
   }
 }

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
 import MobileNav from '../../src/components/MobileNav';
 import useMediaQuery from '../../src/hooks/useMediaQuery';
 import Navbar from '../../src/components/Navbar';
@@ -10,8 +10,19 @@ import { client } from '../../src/utils/graphqlRequest';
 import { gql } from 'graphql-request';
 import { Articles } from '../../src/types/data';
 
-const PageWrapper = styled.div`
+const fadeIn = keyframes`
+  0% {opacity: 0}
+  100% {opacity: 1}
+`;
+
+const fadeOut = keyframes`
+  0% {opacity: 1}
+  100% {opacity: 0}
+`;
+const PageWrapper = styled.div<{ leavingScreen: boolean }>`
   font-family: Teko;
+  animation-name: ${({ leavingScreen }) => (leavingScreen ? fadeOut : fadeIn)};
+  animation-duration: 2.5s;
 `;
 
 const CategoryPage = ({
@@ -31,6 +42,24 @@ const CategoryPage = ({
     skipCount: 0,
     articles: data.articles,
   });
+  const [currentSlug, setSlug] = useState(slug);
+  const [leavingScreen, setLeavingScreen] = useState(false);
+
+  useEffect(() => {
+    if (articles.articles != data.articles) {
+      setLeavingScreen(true);
+      setTimeout(() => {
+        setArticles({
+          skipCount: 0,
+          articles: data.articles,
+        });
+
+        setSlug(slug);
+
+        setLeavingScreen(false);
+      }, 2500);
+    }
+  }, [data, slug]);
 
   useEffect(() => {
     if (isVisible) {
@@ -75,10 +104,10 @@ const CategoryPage = ({
   }, [isVisible]);
 
   return (
-    <PageWrapper>
+    <PageWrapper key={slug} leavingScreen={leavingScreen}>
       {isMobile ? <MobileNav /> : <Navbar />}
       <IndexMainArticles
-        pageTitle={upperCase(slug.replace('-', ' '))}
+        pageTitle={upperCase(currentSlug.replace('-', ' '))}
         articles={articles.articles}
         spinnerRef={ref}
         categories

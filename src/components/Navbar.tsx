@@ -172,11 +172,13 @@ const Navbar = () => {
   const [hasNotScrolled, setHasNotScrolled] = React.useState(true);
   const firstCategoryList = categoryList.slice(0, 5);
   const secondCategoryList = categoryList.slice(6, 12);
-  const thirdCategoryList = categoryList.slice(13);
+  const thirdCategoryList = categoryList.slice(13, 20);
+  const fourthCategoryList = categoryList.slice(20);
   const categoryLists = [
     firstCategoryList,
     secondCategoryList,
     thirdCategoryList,
+    fourthCategoryList,
   ];
   return (
     <NavWrapper>

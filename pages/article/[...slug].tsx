@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import MobileNav from '../../src/components/MobileNav';
 import Navbar from '../../src/components/Navbar';
 import useMediaQuery from '../../src/hooks/useMediaQuery';
@@ -16,10 +16,22 @@ import MobileRecommendedArticles from '../../src/components/MobileRecommendedArt
 import { ArticleData, Articles } from '../../src/types/data';
 import _ from 'lodash';
 
-const PageWrapper = styled.div`
+const fadeIn = keyframes`
+  0% {opacity: 0}
+  100% {opacity: 1}
+`;
+
+const fadeOut = keyframes`
+  0% {opacity: 1}
+  100% {opacity: 0}
+`;
+
+const PageWrapper = styled.div<{ leavingScreen: boolean }>`
   font-family: Teko;
   display: flex;
   flex-direction: column;
+  animation-name: ${({ leavingScreen }) => (leavingScreen ? fadeOut : fadeIn)};
+  animation-duration: 0.5s;
 `;
 
 const ContentWrapper = styled.div`
@@ -115,6 +127,7 @@ const MobileRecommendationGridWrapper = styled.div`
 
 const ArticlePage = ({
   data,
+  slug,
 }: {
   data: {
     article: ArticleData;
@@ -124,20 +137,30 @@ const ArticlePage = ({
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isRecommendedOnBottom = useMediaQuery('(max-width: 1200px)');
   const [modifiedDocument, setModifiedDocument] = useState([]);
+  const [leavingScreen, setLeavingScreen] = useState(false);
+  const [pageData, setPageData] = useState(data);
+
+  useEffect(() => {
+    setLeavingScreen(true);
+    setTimeout(() => {
+      setPageData(data);
+      setLeavingScreen(false);
+    }, 500);
+  }, [slug, data]);
 
   useEffect(() => {
     if (data.article.content.document) {
+      const parsedDocument = JSON.parse(pageData.article.content.document);
       setModifiedDocument(() => {
-        const temp = Object.keys(data.article.content.document).map((key) => {
+        const temp = Object.keys(parsedDocument).map((key) => {
           return {
-            type: data.article.content.document[key].type,
-            children: data.article.content.document[key].children.map(
-              (child) => {
-                child.text = _.unescape(child.text);
-                child.key = key;
-                return child;
-              }
-            ),
+            type: parsedDocument[key].type,
+            children: parsedDocument[key].children.map((child) => {
+              console.log(child);
+              child.text = _.unescape(child.text);
+              child.key = key;
+              return child;
+            }),
           };
         });
 
@@ -147,40 +170,42 @@ const ArticlePage = ({
   }, [data.article]);
 
   return (
-    <PageWrapper>
+    <PageWrapper key={slug} leavingScreen={leavingScreen}>
       {isMobile ? <MobileNav /> : <Navbar />}
       <ContentWrapper>
         <ArticleWrapper>
           <TitleWrapper>
-            {data.article && <Title>{_.unescape(data.article.title)}</Title>}
+            {pageData.article && (
+              <Title>{_.unescape(pageData.article.title)}</Title>
+            )}
           </TitleWrapper>
           <DateWrapper>
             <Date>
               {data.article &&
-                moment(data.article.translated_date).format(
+                moment(pageData.article.translated_date).format(
                   'dddd, MMMM Do YYYY'
                 )}
             </Date>
           </DateWrapper>
           <ArticleImageWrapper>
-            <ArticleImage src={data.article.image_data} />
+            <ArticleImage src={pageData.article.image_data} />
           </ArticleImageWrapper>
           <ArticleTextWrapper>
             <DocumentRenderer document={modifiedDocument} />
           </ArticleTextWrapper>
         </ArticleWrapper>
-        {data && !isRecommendedOnBottom && (
+        {pageData && !isRecommendedOnBottom && (
           <RecommendationWrapper>
             <RecommendedText>See also:</RecommendedText>
-            <RecommendedArticles data={data.articles} />
+            <RecommendedArticles data={pageData.articles} />
           </RecommendationWrapper>
         )}
       </ContentWrapper>
-      {data && isRecommendedOnBottom && (
+      {pageData && isRecommendedOnBottom && (
         <MobileRecommendationWrapper>
           <RecommendedText>See also:</RecommendedText>
           <MobileRecommendationGridWrapper>
-            <MobileRecommendedArticles data={data.articles} />
+            <MobileRecommendedArticles data={pageData.articles} />
           </MobileRecommendationGridWrapper>
         </MobileRecommendationWrapper>
       )}
@@ -236,7 +261,7 @@ export async function getServerSideProps(context) {
     }
   );
 
-  return { props: { data } };
+  return { props: { data, slug: context.query.slug } };
 }
 
 export default ArticlePage;

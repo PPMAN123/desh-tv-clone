@@ -15,18 +15,19 @@ export async function createArticle(
   paragraphs,
   recommendedArticleSlugs,
   requireCreateRecommendedArticles,
-  connection,
+  prisma,
   articleUrl,
   statuses
 ) {
-  const categoryIdSql = `SELECT id FROM Category WHERE name='${categoryName}'`;
   let status = 400;
   let data;
   try {
-    const [results] = await connection.execute(categoryIdSql);
+    const category = await prisma.category.findFirst({
+      where: { name: categoryName },
+    });
 
-    if (results.length) {
-      const categoryId = results[0].id;
+    if (category) {
+      const categoryId = category.id;
       const paragraphsText =
         '[' +
         Object.keys(paragraphs).reduce((paragraphsString, key, i) => {
@@ -84,10 +85,25 @@ export async function createArticle(
       // const paragraphsText = JSON.stringify(paragraphs).replaceAll("'", '&#39;');
       moment.locale();
       // console.log(moment(translatedDate).format('YYYY-MM-DD kk:mm:ss.SSS'));
-      const insertArticleSql = `INSERT INTO Article(slug,image_data,title,category,translated_date,content) VALUES('${articleSlug}','${imageData}','${title}',${categoryId}, '${moment(
-        translatedDate
-      ).format('YYYY-MM-DD kk:mm:ss.SSS')}', '${paragraphsText}')`;
-      await connection.execute(insertArticleSql);
+      // const insertArticleSql = `INSERT INTO Article(slug,image_data,title,category,translated_date,content) VALUES('${articleSlug}','${imageData}','${title}',${categoryId}, '${moment(
+      //   translatedDate
+      // ).format('YYYY-MM-DD kk:mm:ss.SSS')}', '${paragraphsText}')`;
+
+      const insertArticle = await prisma.article.create({
+        data: {
+          slug: articleSlug,
+          image_data: imageData,
+          title: title,
+          categoryId: categoryId,
+          // translated_date: moment(translatedDate).format(
+          //   'YYYY-MM-DD kk:mm:ss.SSS'
+          // ),
+          translated_date: new Date(translatedDate),
+          content: paragraphsText,
+        },
+      });
+
+      // await connection.execute(insertArticleSql);
       statuses.completed++;
 
       status = 200;
@@ -101,20 +117,20 @@ export async function createArticle(
     }
   } catch (err) {
     status = 400;
-    // console.log(err);
-    if (err.message.includes('errno 1062')) {
-      fs.appendFile('./tmp/dupes.txt', '\n' + err.message, function (err) {
-        if (err) {
-          return console.log(err);
+    if (JSON.stringify(err).includes('P2002')) {
+      fs.appendFile(
+        './tmp/dupes.txt',
+        '\n' + JSON.stringify(err),
+        function (err) {
+          createError(
+            statuses,
+            ErrorType.DuplicatedArticle,
+            articleUrl,
+            ErrorStage.Creation
+          );
+          console.log('New dupe error message has been updated');
         }
-        createError(
-          statuses,
-          ErrorType.DuplicatedArticle,
-          articleUrl,
-          ErrorStage.Creation
-        );
-        console.log('New dupe error message has been updated');
-      });
+      );
     } else {
       fs.appendFile('./tmp/test.txt', JSON.stringify(err), function (err) {
         if (err) {
@@ -130,6 +146,7 @@ export async function createArticle(
       });
     }
   }
+
   return {
     status,
     data,

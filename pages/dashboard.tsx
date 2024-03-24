@@ -11,6 +11,7 @@ import transferRecommendedArticles from '../src/utils/transferRecommendedArticle
 import useCreateArticles from '../src/hooks/useCreateArticles';
 import CreateArticlesSummary from '../src/components/CreateArticlesSummary';
 import FetchForm from '../src/components/FetchForm';
+import useTestApi from '../src/hooks/useTestApi';
 
 const DashbaordPageWrapper = styled.div`
   display: flex;
@@ -39,16 +40,22 @@ const dashboard = () => {
     transferRecommendedArticles();
   };
 
+  const handleTestApi = (e) => {
+    e.preventDefault();
+    useTestApi();
+  };
+
   if (status === 'authenticated' && session.user) {
     return (
       <DashbaordPageWrapper>
         <DashboardNav annotations={`Hello, ${session.user.email}`} />
-        <FetchForm creationObject="articles" />
         <FetchForm creationObject="polls" />
+        <FetchForm creationObject="articles" />
         <button onClick={handleTransferCategories}>transfer categories</button>
         <button onClick={handleTransferRecommendedArticles}>
           transfer recommended articles
         </button>
+        <button onClick={handleTestApi}>Test api</button>
       </DashbaordPageWrapper>
     );
   }

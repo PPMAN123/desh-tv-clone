@@ -1,5 +1,6 @@
 export const categoryList = [
   'national',
+  'polls',
   'politics',
   'international',
   'sports',
@@ -22,6 +23,8 @@ export const categoryList = [
   'entertainment',
   'job',
   'others',
+  'it',
+  'religion',
+  'weather',
+  'probash',
 ];
-
-

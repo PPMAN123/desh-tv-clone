@@ -52,7 +52,13 @@ input StringFilter {
   contains: String
   startsWith: String
   endsWith: String
+  mode: QueryMode
   not: NestedStringFilter
+}
+
+enum QueryMode {
+  default
+  insensitive
 }
 
 input NestedStringFilter {
@@ -176,6 +182,7 @@ input StringNullableFilter {
   contains: String
   startsWith: String
   endsWith: String
+  mode: QueryMode
   not: StringNullableFilter
 }
 
@@ -309,6 +316,118 @@ input CategoryCreateInput {
   articles: ArticleRelateToManyForCreateInput
 }
 
+type Poll {
+  id: ID!
+  slug: String
+  image: ImageFieldOutput
+  image_data: String
+  title: String
+  translated_date: DateTime
+  created_at: DateTime
+  yes_count: Int
+  no_count: Int
+  no_comment_count: Int
+  desh_yes_count: Int
+  desh_no_count: Int
+  desh_no_comment_count: Int
+}
+
+input PollWhereUniqueInput {
+  id: ID
+  slug: String
+  title: String
+}
+
+input PollWhereInput {
+  AND: [PollWhereInput!]
+  OR: [PollWhereInput!]
+  NOT: [PollWhereInput!]
+  id: IDFilter
+  slug: StringFilter
+  image_data: StringNullableFilter
+  title: StringFilter
+  translated_date: DateTimeFilter
+  created_at: DateTimeFilter
+  yes_count: IntFilter
+  no_count: IntFilter
+  no_comment_count: IntFilter
+  desh_yes_count: IntNullableFilter
+  desh_no_count: IntNullableFilter
+  desh_no_comment_count: IntNullableFilter
+}
+
+input IntFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntFilter
+}
+
+input IntNullableFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntNullableFilter
+}
+
+input PollOrderByInput {
+  id: OrderDirection
+  slug: OrderDirection
+  image_data: OrderDirection
+  title: OrderDirection
+  translated_date: OrderDirection
+  created_at: OrderDirection
+  yes_count: OrderDirection
+  no_count: OrderDirection
+  no_comment_count: OrderDirection
+  desh_yes_count: OrderDirection
+  desh_no_count: OrderDirection
+  desh_no_comment_count: OrderDirection
+}
+
+input PollUpdateInput {
+  slug: String
+  image: ImageFieldInput
+  image_data: String
+  title: String
+  translated_date: DateTime
+  created_at: DateTime
+  yes_count: Int
+  no_count: Int
+  no_comment_count: Int
+  desh_yes_count: Int
+  desh_no_count: Int
+  desh_no_comment_count: Int
+}
+
+input PollUpdateArgs {
+  where: PollWhereUniqueInput!
+  data: PollUpdateInput!
+}
+
+input PollCreateInput {
+  slug: String
+  image: ImageFieldInput
+  image_data: String
+  title: String
+  translated_date: DateTime
+  created_at: DateTime
+  yes_count: Int
+  no_count: Int
+  no_comment_count: Int
+  desh_yes_count: Int
+  desh_no_count: Int
+  desh_no_comment_count: Int
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -333,6 +452,12 @@ type Mutation {
   updateCategories(data: [CategoryUpdateArgs!]!): [Category]
   deleteCategory(where: CategoryWhereUniqueInput!): Category
   deleteCategories(where: [CategoryWhereUniqueInput!]!): [Category]
+  createPoll(data: PollCreateInput!): Poll
+  createPolls(data: [PollCreateInput!]!): [Poll]
+  updatePoll(where: PollWhereUniqueInput!, data: PollUpdateInput!): Poll
+  updatePolls(data: [PollUpdateArgs!]!): [Poll]
+  deletePoll(where: PollWhereUniqueInput!): Poll
+  deletePolls(where: [PollWhereUniqueInput!]!): [Poll]
 }
 
 type Query {
@@ -345,6 +470,9 @@ type Query {
   categories(where: CategoryWhereInput! = {}, orderBy: [CategoryOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CategoryWhereUniqueInput): [Category!]
   category(where: CategoryWhereUniqueInput!): Category
   categoriesCount(where: CategoryWhereInput! = {}): Int
+  polls(where: PollWhereInput! = {}, orderBy: [PollOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: PollWhereUniqueInput): [Poll!]
+  poll(where: PollWhereUniqueInput!): Poll
+  pollsCount(where: PollWhereInput! = {}): Int
   keystone: KeystoneMeta!
 }
 
@@ -432,11 +560,6 @@ enum KeystoneAdminUIFieldMetaItemViewFieldMode {
 enum KeystoneAdminUIFieldMetaItemViewFieldPosition {
   form
   sidebar
-}
-
-enum QueryMode {
-  default
-  insensitive
 }
 
 type KeystoneAdminUIFieldGroupMeta {

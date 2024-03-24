@@ -1,10 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import useMediaQuery from '../hooks/useMediaQuery';
 import IndexMainArticle from './IndexMainArticle';
-import RecommendedArticles from './RecommendedArticles';
-import { GetServerSideProps } from 'next';
-import useOnScreen from '../hooks/useOnScreen';
 
 const IndexMainArticlesWrapper = styled.div`
   margin: 4vh auto 0 auto;

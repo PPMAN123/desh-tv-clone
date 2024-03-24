@@ -48,7 +48,7 @@ export default list({
     image_data: text({
       db: {
         //@ts-ignore
-        nativeType: 'LongText',
+        nativeType: 'Text',
         isNullable: true,
       },
       hooks: {

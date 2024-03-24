@@ -19,27 +19,33 @@ export async function fetchArticle(articleUrl, statuses) {
 
     let areParagraphsProblematic = false;
     const dom = cheerio.load(data);
-    let date = dom(
-      '.rpt_info_section > .entry_update'
-      //@ts-ignore
-    )[0].children[0].next.data.trim(); // Object
+    // let date = dom(
+    //   '.rpt_info_section > .entry_update'
+    //   //@ts-ignore
+    // )[0].children[0].next.data.trim(); // Object
+    let date: any = dom('.rpt_info_section > .entry_update');
+
+    date = dom(date).text();
     moment.locale('bn');
     date = moment(date, 'DD MMMM YYYY, HH:mm | GMT ZZ');
     moment.locale('en');
     date = moment(date).valueOf();
+
     const title = dom('h1').text().trim();
     const articleParagraphs = dom('.dtl_content_section > p');
     // const recommendedArticleSlugsAnchors = dom(
     //   '.col-md-12 > .row > div > div > a'
     // );
 
-    const articleSlug =
-      '/article' + articleUrl.substring(19, articleUrl.lastIndexOf('/'));
+    const articleSlug = '/article' + articleUrl.substring(19);
 
     console.log('ARTICLE SLUG', articleSlug);
 
     let categoryName = articleSlug.substring(9);
+
     categoryName = categoryName.substring(0, categoryName.indexOf('/'));
+
+    console.log('ARTICLE CATEGORY', categoryName);
 
     let translatedTitle = await getTranslationText('bn', 'en', title);
     translatedTitle = translatedTitle
