@@ -133,6 +133,7 @@ const ArticlePage = ({
     article: ArticleData;
     articles: Articles;
   };
+  slug: string;
 }) => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isRecommendedOnBottom = useMediaQuery('(max-width: 1200px)');
